@@ -8,6 +8,7 @@ The mod ID, name, version and release filename remain unchanged. Original author
 - Pending scan positions have a hash index instead of repeatedly searching the priority queue. The original priority queue traversal order is retained.
 - The before-break hook only checks player/tool eligibility. Its previous tree scan discarded the result; the after-break hook still scans the current world and applies the original cutting rules.
 - Empty adjacency restrictions skip the six neighboring block reads. Configured restrictions retain their checks.
+- Routine minimum/maximum break-size rejection messages use DEBUG, avoiding per-attempt INFO spam. Size limits and existing player notifications are unchanged.
 - Scan-limit console messages are limited to one per 30 seconds per tree builder, across positions. Scans still abort at the original limit and players still receive the existing failure notification.
 - Fabric is the default build target; Forge and NeoForge sources remain available but are not built by default.
 
