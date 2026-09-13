@@ -26,7 +26,7 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.PriorityQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import static java.util.Optional.empty;
@@ -34,6 +34,8 @@ import static java.util.Optional.empty;
 @RequiredArgsConstructor
 @Log4j2
 public class TreeBuilder{
+	private static final Predicate<IBlock> ALLOW_ALL_ADJACENT = block -> true;
+	private final ScanLogLimiter scanLimitLog = new ScanLogLimiter(TimeUnit.SECONDS.toNanos(30));
 	private static final EnumSet<DirectionCompat> ALL_DIRECTIONS = EnumSet.allOf(DirectionCompat.class);
 	
 	private final FallingTreeCommon<?> mod;
@@ -46,7 +48,7 @@ public class TreeBuilder{
 		}
 		
 		var maxScanSize = mod.getConfiguration().getTrees().getMaxScanSize();
-		var toAnalyzePos = new PriorityQueue<ToAnalyzePos>();
+		var toAnalyzePos = new ScanQueue<ToAnalyzePos>();
 		var analyzedPos = new HashSet<ToAnalyzePos>();
 		var tree = new Tree(level, originPos);
 		var detectionMode = getDetectionMode(level, originPos);
@@ -67,7 +69,9 @@ public class TreeBuilder{
 				analyzedPos.add(analyzingPos);
 				
 				if(tree.getSize() > maxScanSize){
-					log.info("Tree at {} reached max scan size of {}", tree.getHitPos(), maxScanSize);
+					if(scanLimitLog.shouldLog(System.nanoTime())){
+						log.info("Tree at {} reached max scan size of {} (further scan-limit messages suppressed for 30 seconds)", tree.getHitPos(), maxScanSize);
+					}
 					throw new TreeTooBigException();
 				}
 				if(analyzingPos.treePartType().isEdge() && analyzingPos.sequenceSinceLastLog() >= mod.getConfiguration().getTrees().getMaxLeafDistanceFromLog()){
@@ -77,9 +81,8 @@ public class TreeBuilder{
 				var potentialPositions = analyzingPos.positionFetcher().getPositions(level, originPos, analyzingPos);
 				var nextPositions = filterPotentialPos(boundingBoxSearch, adjacentPredicate, level, originPos, originBlock, analyzingPos, potentialPositions, analyzedPos);
 				
-				nextPositions.removeAll(analyzedPos);
-				nextPositions.removeAll(toAnalyzePos);
-				toAnalyzePos.addAll(nextPositions);
+				nextPositions.removeIf(toAnalyzePos::contains);
+				nextPositions.forEach(toAnalyzePos::add);
 			}
 			
 			postProcess(tree);
@@ -113,11 +116,10 @@ public class TreeBuilder{
 	@NotNull
 	private Predicate<IBlock> getAdjacentPredicate(){
 		var allowedList = mod.getConfiguration().getTrees().getAllowedAdjacentBlockBlocks(mod);
-		var base = mod.getConfiguration().getTrees().getAllAllowedAdjacentBlockBlocks(mod);
-		
 		if(allowedList.isEmpty()){
-			return block -> true;
+			return ALLOW_ALL_ADJACENT;
 		}
+		var base = mod.getConfiguration().getTrees().getAllAllowedAdjacentBlockBlocks(mod);
 		return switch(mod.getConfiguration().getTrees().getAdjacentStopMode()){
 			case STOP_ALL -> block -> {
 				var isAllowed = allowedList.contains(block) || base.contains(block);
@@ -196,7 +198,10 @@ public class TreeBuilder{
 	}
 	
 	private static boolean checkAdjacent(@NotNull Predicate<IBlock> adjacentPredicate, @NotNull ILevel level, IBlockPos pos){
-		return EnumSet.allOf(DirectionCompat.class).stream()
+		if(adjacentPredicate == ALLOW_ALL_ADJACENT){
+			return true;
+		}
+		return ALL_DIRECTIONS.stream()
 				.map(pos::relative)
 				.map(level::getBlockState)
 				.map(IBlockState::getBlock)

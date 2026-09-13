@@ -40,12 +40,8 @@ public class TreeHandler{
 		if(shouldPreserveTool(player)){
 			return true;
 		}
-		try{
-			mod.getTreeBuilder().getTree(player, level, originPos, originState, originEntity).isEmpty();
-		}
-		catch(TreeTooBigException e){
-			return false;
-		}
+		// Detection belongs to breakTree: the pre-break scan discarded its result.
+
 		return false;
 	}
 	
