@@ -25,11 +25,11 @@ public class ToolDamageHandler{
 		this.damageRounding = damageRounding;
 		
 		if(breakableCount < minSize){
-			log.info("Tree isn't big enough {}", minSize);
+			log.debug("Tree isn't big enough {}", minSize);
 			throw new BreakTreeTooSmallException();
 		}
 		if(breakableCount > maxSize && maxSizeAction == MaxSizeAction.ABORT){
-			log.info("Tree reached max size of {}", maxSize);
+			log.debug("Tree reached max size of {}", maxSize);
 			throw new BreakTreeTooBigException();
 		}
 		
