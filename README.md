@@ -1,3 +1,6 @@
+> Maintained Fabric 1.21.1 fork for stephen92, based on upstream tag `1.21.1.11`.
+> See [fork changes and installation](FORK.md). Original authorship and LGPL-3.0 license are retained.
+
 [![Discord Server](https://img.shields.io/discord/1007349372444491856.svg?logo=Discord&colorB=7289da)](https://discord.gg/uXWsRftdy7)
 [![Curseforge Downloads](http://cf.way2muchnoise.eu/short_349559_downloads.svg)](https://www.curseforge.com/minecraft/mc-mods/falling-tree)
 [![Modrinth Downloads](https://img.shields.io/modrinth/dt/fallingtree?logo=Modrinth)](https://modrinth.com/mod/fallingtree)

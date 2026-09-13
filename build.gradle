@@ -104,6 +104,7 @@ tasks.register('buildJar', Jar) {
         dependsOn(":neoforge:build")
     }
 
+    from("LICENSE.md", "FORK.md")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from {
         zipTree("common/build/libs/common-${project.version}.jar")
