@@ -16,7 +16,7 @@ No scan-result cache is used, so changes to connected trees cannot leave stale t
 
 ## Server configuration
 
-`config/server/fallingtree.json` is based on the supplied production config. Its only changed setting is `trees.searchAreaRadius`, from `-1` (unlimited) to `8` (eight blocks in each horizontal direction from the cut). The scan limit remains 500, maximum break size remains 100, and oversized trees still abort. Large branches outside the radius may remain standing. Dense connections within the radius may still exceed either limit.
+`config/server/fallingtree.json` is based on the supplied production config. Its changed settings are `trees.searchAreaRadius`, from `-1` (unlimited) to `8` (eight blocks in each horizontal direction from the cut), and `trees.maxSizeAction`, from `ABORT` to `CUT`. The scan limit remains 500 and maximum break size remains 100. Trees successfully detected above the break limit are cut in sections of up to 100 blocks, subject to tool durability and protection checks. Exceeding the separate 500-part scan limit still aborts detection. Large branches outside the radius may remain standing. Dense connections within the radius may still exceed the scan limit and fail detection.
 
 This is a starting setting to test in the affected biomes. Normal logs obey this radius; upstream special handling for mangrove roots, nether wart blocks and leaf edges is retained, so it is not a universal bound for every scanned block type. The supplied config uses `INSTANTANEOUS`; it does not enable a falling animation.
 

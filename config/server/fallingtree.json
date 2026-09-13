@@ -12,7 +12,7 @@
     "minSize": 0,
     "maxSize": 100,
     "maxLeafDistanceFromLog": 15,
-    "maxSizeAction": "ABORT",
+    "maxSizeAction": "CUT",
     "breakOrder": "FURTHEST_FIRST",
     "minimumLeavesAroundRequired": 1,
     "includePersistentLeavesInRequiredCount": true,
