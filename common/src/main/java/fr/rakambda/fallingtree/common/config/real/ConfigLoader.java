@@ -17,12 +17,14 @@ public class ConfigLoader{
 	
 	@NotNull
 	static <T> T loadConfig(@NotNull T config, @NotNull Class<T> clazz, @NotNull Path path) throws IOException{
+		String defaults = gson.toJson(config);
 		if(Files.isRegularFile(path)){
 			try(var reader = Files.newBufferedReader(path)){
 				config = gson.fromJson(reader, clazz);
 			}
 		}
-		return saveConfig(config, path);
+		SafeJsonDefaults.update(path, defaults);
+		try(var reader = Files.newBufferedReader(path)){ return gson.fromJson(reader, clazz); }
 	}
 	
 	@NotNull
