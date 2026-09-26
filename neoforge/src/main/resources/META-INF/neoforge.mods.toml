@@ -27,7 +27,7 @@ versionRange = "[${minecraftVersion}]"
 ordering="NONE"
 side="BOTH"
 [[dependencies.fallingtree]]
-modId = "cloth-config"
+modId = "cloth_config"
 type="optional"
 versionRange = "[15.0.0,)"
 ordering = "NONE"
