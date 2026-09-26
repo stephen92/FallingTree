@@ -1,0 +1,60 @@
+plugins { id 'java'; id 'net.neoforged.moddev' version '2.0.80' }
+version='1.21.1.11'
+group='fr.rakambda'
+base.archivesName='FallingTree-1.21.1'
+java.toolchain.languageVersion=JavaLanguageVersion.of(21)
+repositories { mavenCentral(); maven { url='https://maven.shedaniel.me/' } }
+sourceSets {
+    main {
+        java.srcDir '../common/src/main/java'
+        java.srcDir 'src/pixelmon/java'
+        java.exclude { details -> details.file.absolutePath.replace('\\','/').contains('/common/src/main/java/') && details.name in ['ConfigLoader.java','SafeJsonDefaults.java'] }
+        resources.srcDir '../common/src/main/resources'
+        resources.srcDir 'src/generated/resources'
+    }
+    test { java.srcDir '../common/src/test/java' }
+    gametest { compileClasspath += sourceSets.main.output+sourceSets.main.compileClasspath }
+}
+neoForge {
+    version='21.1.248'
+    addModdingDependenciesTo sourceSets.gametest
+    accessTransformers.from(file('src/main/resources/META-INF/neoforge.accesstransformer.cfg'))
+    mods { fallingtree { sourceSet sourceSets.main }; fallingtree_test { sourceSet sourceSets.gametest } }
+    runs {
+        packagedServer { server(); programArgument '--nogui'; loadedMods=[]; gameDirectory=file('build/packaged-server') }
+        packagedGametest { type='gameTestServer'; loadedMods=[mods.fallingtree_test]; gameDirectory=file('build/packaged-gametest'); systemProperty 'neoforge.enabledGameTestNamespaces','fallingtree_test' }
+    }
+}
+dependencies {
+    compileOnly 'org.projectlombok:lombok:1.18.34'
+    annotationProcessor 'org.projectlombok:lombok:1.18.34'
+    compileOnly 'org.jetbrains:annotations:26.0.1'
+    compileOnly 'me.shedaniel.cloth:cloth-config-neoforge:15.0.130'
+    testImplementation 'com.google.code.gson:gson:2.10.1'
+    testImplementation 'org.apache.logging.log4j:log4j-api:2.24.1'
+    testImplementation 'org.apache.logging.log4j:log4j-core:2.24.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.0'
+    testImplementation 'org.mockito:mockito-core:5.13.0'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+tasks.withType(JavaCompile).configureEach { options.release=21; options.encoding='UTF-8' }
+tasks.withType(Test).configureEach { useJUnitPlatform() }
+tasks.processResources {
+    duplicatesStrategy=DuplicatesStrategy.EXCLUDE
+    filesMatching('META-INF/neoforge.mods.toml') { expand(modId:'fallingtree',modName:'FallingTree',version:project.version,minecraftVersion:'1.21.1') }
+}
+tasks.jar { archiveFileName='FallingTree-1.21.1-1.21.1.11.jar'; from('../LICENSE.md','../FORK.md') }
+tasks.named('runPackagedServer') {
+    dependsOn tasks.jar
+    standardInput=System.in
+    doFirst { copy { from tasks.jar.archiveFile; into 'build/packaged-server/mods' } }
+}
+tasks.named('runPackagedGametest') {
+    dependsOn tasks.jar
+    doFirst { copy { from tasks.jar.archiveFile; into 'build/packaged-gametest/mods' } }
+}
+tasks.register('packagedTest',Test) {
+    dependsOn tasks.testClasses,tasks.jar
+    testClassesDirs=sourceSets.test.output.classesDirs
+    classpath=files(sourceSets.test.output,tasks.jar.archiveFile)+configurations.testRuntimeClasspath
+}

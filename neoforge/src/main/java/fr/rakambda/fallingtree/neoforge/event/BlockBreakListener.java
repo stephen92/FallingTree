@@ -43,7 +43,8 @@ public class BlockBreakListener{
 		event.setNewSpeed(result.get());
 	}
 	
-	@SubscribeEvent
+	// Let protection handlers cancel the origin before any additional logs are changed.
+	@SubscribeEvent(priority = net.neoforged.bus.api.EventPriority.LOWEST)
 	public void onBlockBreakEvent(@Nonnull BlockEvent.BreakEvent event){
 		if(event.isCanceled()){
 			return;
