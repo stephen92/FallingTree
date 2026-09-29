@@ -15,7 +15,7 @@ From this directory, use the included Gradle 8.12.1 wrapper:
 
 `settings.gradle` selects `build-neoforge.gradle`, pinned to ModDevGradle 2.0.80. The older root-managed build file is retained. The NeoForge-specific `src/pixelmon` source directory replaces only the common JSON loader/updater in this standalone artifact. Despite the directory name, these classes do not depend on Pixelmon.
 
-For the isolated Pixelmon check, put the operator-provided Pixelmon 9.4.1 release JAR in `build/packaged-gametest/mods/`. The test run stages the exact FallingTree release JAR there automatically. Configure the isolated server for `server-ip=127.0.0.1` and `server-port=29562`. No additional EULA was accepted for these GameTest runs.
+For the isolated Pixelmon check, put the operator-provided Pixelmon 9.4.1 release JAR in `build/packaged-gametest/mods/`. The test run stages the exact FallingTree release JAR there automatically, after deleting every other JAR in that folder except `Pixelmon-*.jar` (`-PkeepMods` skips the clean-up). Configure the isolated server for `server-ip=127.0.0.1` and `server-port=29562`. No additional EULA was accepted for these GameTest runs.
 
 ## Configuration and protection fixes
 

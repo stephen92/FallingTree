@@ -47,11 +47,12 @@ tasks.jar { archiveFileName='FallingTree-1.21.1-1.21.1.11.jar'; from('../LICENSE
 tasks.named('runPackagedServer') {
     dependsOn tasks.jar
     standardInput=System.in
-    doFirst { copy { from tasks.jar.archiveFile; into 'build/packaged-server/mods' } }
+    doFirst { if(!project.hasProperty('keepMods'))project.delete(project.fileTree('build/packaged-server/mods'){include '*.jar'; exclude 'Pixelmon-*.jar'}); copy { from tasks.jar.archiveFile; into 'build/packaged-server/mods' } }
 }
 tasks.named('runPackagedGametest') {
     dependsOn tasks.jar
-    doFirst { copy { from tasks.jar.archiveFile; into 'build/packaged-gametest/mods' } }
+    // Clears every other JAR (the operator-provided Pixelmon one stays), so no stale copy loads beside the fresh build.
+    doFirst { if(!project.hasProperty('keepMods'))project.delete(project.fileTree('build/packaged-gametest/mods'){include '*.jar'; exclude 'Pixelmon-*.jar'}); copy { from tasks.jar.archiveFile; into 'build/packaged-gametest/mods' } }
 }
 tasks.register('packagedTest',Test) {
     dependsOn tasks.testClasses,tasks.jar
