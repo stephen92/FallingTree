@@ -32,7 +32,10 @@ public final class TreeTests {
         player.setGameMode(GameType.SURVIVAL);
         var axe=new ItemStack(Items.DIAMOND_AXE); player.setItemInHand(InteractionHand.MAIN_HAND,axe);
         var base=h.absolutePos(new BlockPos(2,2,2)); tree(h,base);
+        TestMod.COMPLETED.clear();
         player.gameMode.destroyBlock(base);
+        h.assertTrue(TestMod.COMPLETED.size()==2 && new java.util.HashSet<>(TestMod.COMPLETED).size()==2,
+            "each successfully felled extra log emits exactly one completion");
         h.assertTrue(level.getBlockState(base).isAir() && level.getBlockState(base.above()).isAir() && level.getBlockState(base.above(2)).isAir(),"native block break removes entire tree");
         // Preserve the shared fork's accounting: two additional logs, minus its vanilla
         // credit, plus the ordinary hit-block use. This port does not rebalance tool cost.
@@ -63,7 +66,9 @@ public final class TreeTests {
         player.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_AXE));
         var base=h.absolutePos(new BlockPos(2,2,2));
         for(var mode:new BreakMode[]{BreakMode.FALL_ITEM,BreakMode.FALL_BLOCK,BreakMode.FALL_ALL_BLOCK}) {
-            config.getTrees().setBreakMode(mode);config.getTrees().setLeavesBreaking(mode==BreakMode.FALL_ALL_BLOCK);tree(h,base);player.gameMode.destroyBlock(base);
+            config.getTrees().setBreakMode(mode);config.getTrees().setLeavesBreaking(mode==BreakMode.FALL_ALL_BLOCK);tree(h,base);TestMod.COMPLETED.clear();player.gameMode.destroyBlock(base);
+            h.assertTrue(TestMod.COMPLETED.contains(base.above()) && TestMod.COMPLETED.contains(base.above(2))
+                && !TestMod.COMPLETED.contains(base), mode+" notifies extra logs without duplicating origin");
             h.assertTrue(level.getBlockState(base).isAir()&&level.getBlockState(base.above()).isAir()&&level.getBlockState(base.above(2)).isAir(),mode+" removes logs");
             var entities=level.getEntitiesOfClass(net.minecraft.world.entity.item.FallingBlockEntity.class,new AABB(base).inflate(5));
             var logEntities=entities.stream().filter(e->e.getBlockState().is(Blocks.OAK_LOG)).toList();
