@@ -1,5 +1,7 @@
 package fr.rakambda.fallingtree.neoforge.common;
 
+import fr.rakambda.fallingtree.common.wrapper.IBlockEntity;
+
 import fr.rakambda.fallingtree.common.FallingTreeCommon;
 import fr.rakambda.fallingtree.common.config.enums.BreakMode;
 import fr.rakambda.fallingtree.common.leaf.LeafBreakingHandler;
@@ -222,6 +224,13 @@ public class FallingTreeCommonsImpl extends FallingTreeCommon<Direction>{
 		var event = new FallingTreeBlockBreakEvent((Level) level.getRaw(), (BlockPos) blockPos.getRaw(), (BlockState) blockState.getRaw(), (Player) player.getRaw());
 		breakEvents.add(event);
 		return !NeoForge.EVENT_BUS.post(event).isCanceled();
+	}
+
+	@Override
+	public void onBlockBroken(@NotNull ILevel level, @NotNull IBlockPos pos, @NotNull IBlockState state,
+	                          @NotNull IPlayer player, IBlockEntity blockEntity){
+		NeoForge.EVENT_BUS.post(new fr.rakambda.fallingtree.neoforge.event.FallingTreeBlockBrokenEvent(
+			(Level) level.getRaw(), (BlockPos) pos.getRaw(), (BlockState) state.getRaw(), (Player) player.getRaw()));
 	}
 	
 	@Override

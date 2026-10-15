@@ -5,6 +5,8 @@ The mod ID, name, version and release filename remain unchanged. Original author
 
 ## Changes
 
+- Successfully removed extra blocks now emit completion notifications after permission checks. Fabric emits `PlayerBlockBreakEvents.AFTER` without recursively scanning another tree; the manually chopped origin is left to its original event. NeoForge exposes the matching noncancelable `FallingTreeBlockBrokenEvent`, separate from its cancelable permission check. Instantaneous and falling-animation modes are covered; shift-down still consumes one log per manual chop. Jobs can now credit the extra logs through its existing protection checks.
+
 - Pending scan positions have a hash index instead of repeatedly searching the priority queue. The original priority queue traversal order is retained.
 - The before-break hook only checks player/tool eligibility. Its previous tree scan discarded the result; the after-break hook still scans the current world and applies the original cutting rules.
 - Empty adjacency restrictions skip the six neighboring block reads. Configured restrictions retain their checks.

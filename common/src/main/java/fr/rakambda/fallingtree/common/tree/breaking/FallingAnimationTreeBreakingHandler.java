@@ -74,7 +74,11 @@ public class FallingAnimationTreeBreakingHandler implements ITreeBreakingHandler
 					fallLeaf(scannedLeaves, player, level, 5, logBlockPos.west());
 					fallLeaf(scannedLeaves, player, level, 5, logBlockPos.above());
 					
+					var blockEntity = level.getBlockEntity(logBlockPos);
 					var isRemoved = level.removeBlock(logBlockPos, false);
+					if(isRemoved && part.treePartType().isBreakable() && !tree.getHitPos().equals(logBlockPos)){
+						mod.onBlockBroken(level, logBlockPos, logState, player, blockEntity);
+					}
 					
 					return part.treePartType().isBreakable() && isRemoved ? 1 : 0;
 				})

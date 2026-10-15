@@ -7,7 +7,10 @@ import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.bus.api.EventPriority;
 @Mod("fallingtree_test") public final class TestMod {
     static final Set<BlockPos> PROTECTED=new HashSet<>();
+    static final List<BlockPos> COMPLETED=new ArrayList<>();
     public TestMod() {
         NeoForge.EVENT_BUS.addListener(EventPriority.LOW,false,BlockEvent.BreakEvent.class,e->{if(PROTECTED.contains(e.getPos()))e.setCanceled(true);});
+        NeoForge.EVENT_BUS.addListener(fr.rakambda.fallingtree.neoforge.event.FallingTreeBlockBrokenEvent.class,
+            e -> COMPLETED.add(e.getPos().immutable()));
     }
 }

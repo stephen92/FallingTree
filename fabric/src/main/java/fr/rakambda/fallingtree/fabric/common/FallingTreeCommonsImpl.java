@@ -1,5 +1,7 @@
 package fr.rakambda.fallingtree.fabric.common;
 
+import fr.rakambda.fallingtree.common.wrapper.IBlockEntity;
+
 import fr.rakambda.fallingtree.common.FallingTreeCommon;
 import fr.rakambda.fallingtree.common.config.enums.BreakMode;
 import fr.rakambda.fallingtree.common.leaf.LeafBreakingHandler;
@@ -220,6 +222,19 @@ public class FallingTreeCommonsImpl extends FallingTreeCommon<Direction>{
 				(BlockState) blockState.getRaw(),
 				(BlockEntity) Optional.ofNullable(level.getBlockEntity(blockPos)).map(IWrapper::getRaw).orElse(null)
 		);
+	}
+
+	private boolean notifyingBreak;
+	@Override public boolean isNotifyingBreak(){ return notifyingBreak; }
+	@Override
+	public void onBlockBroken(@NotNull ILevel level, @NotNull IBlockPos pos, @NotNull IBlockState state,
+	                          @NotNull IPlayer player, IBlockEntity blockEntity){
+		notifyingBreak = true;
+		try {
+			PlayerBlockBreakEvents.AFTER.invoker().afterBlockBreak((Level) level.getRaw(), (Player) player.getRaw(),
+				(BlockPos) pos.getRaw(), (BlockState) state.getRaw(),
+				blockEntity == null ? null : (BlockEntity) blockEntity.getRaw());
+		} finally { notifyingBreak = false; }
 	}
 	
 	@Override

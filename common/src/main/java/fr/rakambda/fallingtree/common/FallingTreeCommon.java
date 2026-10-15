@@ -1,5 +1,8 @@
 package fr.rakambda.fallingtree.common;
 
+import fr.rakambda.fallingtree.common.wrapper.IBlockEntity;
+import org.jetbrains.annotations.Nullable;
+
 import fr.rakambda.fallingtree.common.command.ToggleCommand;
 import fr.rakambda.fallingtree.common.config.IConfiguration;
 import fr.rakambda.fallingtree.common.config.IToolConfiguration;
@@ -231,6 +234,13 @@ public abstract class FallingTreeCommon<D extends Enum<D>> {
     }
 
     public abstract boolean checkCanBreakBlock(@NotNull ILevel level, @NotNull IBlockPos blockPos, @NotNull IBlockState blockState, @NotNull IPlayer player);
+
+    /** Completion notification, after removal, distinct from the cancelable permission check. */
+    public void onBlockBroken(@NotNull ILevel level, @NotNull IBlockPos pos, @NotNull IBlockState state,
+                              @NotNull IPlayer player, @Nullable IBlockEntity blockEntity) {}
+
+    /** Prevents completion notifications from starting another tree scan. */
+    public boolean isNotifyingBreak() { return false; }
 
     @NotNull
     public abstract IItemStack getEmptyItemStack();

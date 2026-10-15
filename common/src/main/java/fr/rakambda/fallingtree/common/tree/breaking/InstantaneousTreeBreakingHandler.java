@@ -64,7 +64,11 @@ public class InstantaneousTreeBreakingHandler implements ITreeBreakingHandler{
 								lootHandler.breakNewTrunk()
 						);
 					}
+					var blockEntity = level.getBlockEntity(logBlockPos);
 					var isRemoved = level.removeBlock(logBlockPos, false);
+					if(isRemoved && !tree.getHitPos().equals(logBlockPos)){
+						mod.onBlockBroken(level, logBlockPos, logState, player, blockEntity);
+					}
 					return isRemoved ? 1 : 0;
 				})
 				.sum();

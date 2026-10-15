@@ -44,6 +44,7 @@ public class BlockBreakListener implements PlayerBlockBreakEvents.Before, Player
 	
 	@Override
 	public void afterBlockBreak(Level level, Player player, BlockPos blockPos, BlockState blockState, BlockEntity blockEntity){
+		if(mod.isNotifyingBreak()) return;
 		var wrappedPlayer = new PlayerWrapper(player);
 		var wrappedLevel = level instanceof ServerLevel serverLevel ? new ServerLevelWrapper(serverLevel) : new LevelWrapper(level);
 		var wrappedPos = new BlockPosWrapper(blockPos);
